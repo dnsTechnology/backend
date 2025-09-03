@@ -32,26 +32,61 @@ export const createBlog = async (req, res) => {
 
 export const updateBlog = async (req, res) => {
   try {
-    const { title, description, category, tags, featuredImage } = req.body;
-    if (!title || !description || !category || !featuredImage) {
-      return sendRes("All fields are required", "", 400, false, res);
+    const { id } = req.params;
+    const { title, description, category, tags, image } = req.body;
+
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return sendRes("Invalid blog ID", "", 400, false, res);
     }
+
+    // Check required fields
+    if (!title || !description || !category || !image) {
+      return sendRes(
+        "All required fields must be provided",
+        "",
+        400,
+        false,
+        res
+      );
+    }
+
+    // Check user
     const user = req.user;
-    if (!user) return sendRes("User not found", "", 404, false, res);
-    const authorId = new mongoose.Types.ObjectId(user._id);
-    await Blog.findByIdAndUpdate(req.params.id, {
-      title,
-      description,
-      category,
-      tags,
-      featuredImage,
-      author: authorId,
-      status: "published",
-    });
-    return sendRes("Blog updated successfully", "", 200, true, res);
+    if (!user) {
+      return sendRes("User not authenticated", "", 401, false, res);
+    }
+
+    // Find existing blog
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return sendRes("Blog not found", "", 404, false, res);
+    }
+
+    // Optional: check if the current user is the author (authorization)
+    if (blog.author.toString() !== user._id.toString()) {
+      return sendRes(
+        "You are not authorized to update this blog",
+        "",
+        403,
+        false,
+        res
+      );
+    }
+
+    // Update blog
+    blog.title = title;
+    blog.description = description;
+    blog.category = category;
+    blog.tags = tags || [];
+    blog.featuredImage = image;
+
+    const updatedBlog = await blog.save();
+
+    return sendRes("Blog updated successfully", updatedBlog, 200, true, res);
   } catch (error) {
-    console.log(error);
-    sendRes(error.message, "", 500, false, res);
+    console.error("Update Blog Error:", error);
+    return sendRes("Internal server error", error.message, 500, false, res);
   }
 };
 
@@ -70,29 +105,42 @@ export const deleteBlog = async (req, res) => {
 
 export const getAllBlogsWithPagination = async (req, res) => {
   try {
+    // Parse query parameters and provide defaults
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 5;
+
+    if (page < 1 || limit < 1) {
+      return sendRes("Invalid page or limit value", "", 400, false, res);
+    }
+
     const skip = (page - 1) * limit;
+
+    // Fetch paginated blogs
     const blogs = await Blog.find()
       .skip(skip)
       .limit(limit)
+      .sort({ createdAt: -1 })
       .populate("author", "name");
+
+    // Count total blogs
     const totalBlogs = await Blog.countDocuments();
     const totalPages = Math.ceil(totalBlogs / limit);
+
     return sendRes(
       "Blogs fetched successfully",
       {
         blogs,
         totalPages,
         currentPage: page,
+        totalBlogs,
       },
       200,
       true,
       res
     );
   } catch (error) {
-    console.log(error);
-    sendRes(error.message, "", 500, false, res);
+    console.error(error);
+    return sendRes(error.message, "", 500, false, res);
   }
 };
 
@@ -135,11 +183,7 @@ export const createCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log("hiiii");
     const { name, description } = req.body;
-    console.log(req.params.id);
-    console.log(name, description);
     if (!name) {
       return sendRes("All fields are required", "", 400, false, res);
     }

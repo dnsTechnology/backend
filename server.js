@@ -8,6 +8,8 @@ import userRoutes from "./routes/user.js";
 import commentRoutes from "./routes/comment.js";
 import uploadRoutes from "./routes/upload.js";
 import categoryRoutes from "./routes/category.js";
+import productRoutes from "./routes/product.js";
+import teamRoutes from "./routes/team.js";
 import "dotenv/config";
 import { sendRes } from "./utils/utils.js";
 import { isAdmin, isUser } from "./middleware/adminCheck.js";
@@ -34,6 +36,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/product", productRoutes);
+app.use("/api/team", teamRoutes);
 
 // Root route
 app.get("/", (req, res) => {
