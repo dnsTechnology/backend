@@ -90,9 +90,6 @@ export const updateTeamMember = async (req, res) => {
   try {
     const user = req?.user;
     if (!user) return sendRes("User not found", "", 404, false, res);
-    if (user.role !== "admin")
-      return sendRes("Admin access required", "", 403, false, res);
-
     const { id } = req.params;
     if (!isValidObjectId(id))
       return sendRes("Invalid member ID", "", 400, false, res);
@@ -136,9 +133,6 @@ export const deleteTeamMember = async (req, res) => {
   try {
     const user = req?.user;
     if (!user) return sendRes("User not found", "", 404, false, res);
-    if (user.role !== "admin")
-      return sendRes("Admin access required", "", 403, false, res);
-
     const { id } = req.params;
     if (!isValidObjectId(id))
       return sendRes("Invalid member ID", "", 400, false, res);

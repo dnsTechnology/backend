@@ -10,9 +10,11 @@ import uploadRoutes from "./routes/upload.js";
 import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/product.js";
 import teamRoutes from "./routes/team.js";
+import orderRoutes from "./routes/order.js";
 import "dotenv/config";
 import { sendRes } from "./utils/utils.js";
 import { isAdmin, isUser } from "./middleware/adminCheck.js";
+import { sendBookingMailToUserAndAdmin } from "./utils/sendMail.js";
 
 const app = express();
 app.use(cookieParser());
@@ -38,6 +40,11 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/team", teamRoutes);
+app.use("/api/orders", orderRoutes);
+app.post("/api/send-booking-mail", async (req, res) => {
+  const data = req.body;
+  await sendBookingMailToUserAndAdmin(data, req, res);
+});
 
 // Root route
 app.get("/", (req, res) => {
