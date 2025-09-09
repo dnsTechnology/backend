@@ -11,6 +11,8 @@ import categoryRoutes from "./routes/category.js";
 import productRoutes from "./routes/product.js";
 import teamRoutes from "./routes/team.js";
 import orderRoutes from "./routes/order.js";
+import enquiryRoutes from "./routes/enquiry.js";
+import projectRoutes from "./routes/project.js";
 import "dotenv/config";
 import { sendRes } from "./utils/utils.js";
 import { isAdmin, isUser } from "./middleware/adminCheck.js";
@@ -24,7 +26,7 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
 );
 app.use(express.json());
@@ -41,6 +43,8 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/enquiry", enquiryRoutes);
+app.use("/api/project", projectRoutes); // Using enquiryRoutes for project as well
 app.post("/api/send-booking-mail", async (req, res) => {
   const data = req.body;
   await sendBookingMailToUserAndAdmin(data, req, res);

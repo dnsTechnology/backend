@@ -21,6 +21,11 @@ const orderSchema = new mongoose.Schema(
       },
     },
     product: {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Product",
+      },
       productName: {
         type: String,
         required: true,
@@ -39,6 +44,10 @@ const orderSchema = new mongoose.Schema(
         required: true,
         min: 1,
       },
+      discount: {
+        type: Number,
+        default: 0,
+      },
       queries: {
         type: String,
         default: "",
@@ -56,7 +65,7 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // adds createdAt and updatedAt automatically
-  }
+  },
 );
 
 const Order = mongoose.model("Order", orderSchema);
