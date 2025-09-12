@@ -112,3 +112,52 @@ export const sendBookingMailToUserAndAdmin = async (data) => {
     };
   }
 };
+
+// Send Job Application Confirmation Email
+export const sendJobApplicationConfirmationEmail = async (email, position) => {
+  try {
+    if (!email || !position) {
+      return {
+        message: "Email and position is required. please try again later.",
+        status: 400,
+        success: false,
+      };
+    }
+
+    // ===== User Email Template =====
+    const userMailHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #2c3e50;">
+        <h2 style="color: #1a73e8;">Hi,</h2>
+        <p>Thank you for applying for a ${position} with us.</p>
+        <p>We have received your application and our team will review it shortly. If you are shortlisted, we will contact you.</p>
+        <p style="margin-top: 32px;">We appreciate your interest in joining our team!</p>
+        <p style="margin-top: 4px;">— The HR Team of DNS Technology</p>
+
+        <hr style="margin-top: 40px;" />
+        <p style="font-size: 12px; color: gray;">This is an automated message. Please do not reply.</p>
+      </div>
+    `;
+
+    // Send mail to User
+    await transporter.sendMail({
+      from: `"HR Team" <${process.env.NODEMAILER_USER}>`,
+      to: email,
+      subject: "Your Job Application Submission",
+      html: userMailHtml,
+    });
+
+    return {
+      success: true,
+      message: "Confirmation email sent successfully",
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Nodemailer Error:", error);
+    return {
+      success: false,
+      message: "Failed to send confirmation email",
+      status: 500,
+      error: error.message,
+    };
+  }
+};

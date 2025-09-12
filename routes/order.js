@@ -24,7 +24,7 @@ router.post("/create", async (req, res) => {
     const response = await sendBookingMailToUserAndAdmin(
       { ...req.body },
       req,
-      res,
+      res
     );
     if (!response.success) {
       return sendRes(response.message, [], 500, false, res);
@@ -67,7 +67,7 @@ router.post("/create", async (req, res) => {
       order,
       201,
       true,
-      res,
+      res
     );
   } catch (error) {
     console.error("Error creating order:", error);
@@ -106,7 +106,7 @@ router.put("/:id", async (req, res) => {
         [],
         401,
         false,
-        res,
+        res
       );
     }
 
@@ -170,7 +170,7 @@ router.get("/", async (req, res) => {
       { totalOrders, page, limit, orders },
       200,
       true,
-      res,
+      res
     );
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -189,7 +189,7 @@ router.get("/getorder/:id", async (req, res) => {
         [],
         401,
         false,
-        res,
+        res
       );
     }
 
@@ -230,7 +230,7 @@ router.post("/send-email", async (req, res) => {
         "",
         401,
         false,
-        res,
+        res
       );
     }
 
@@ -242,7 +242,7 @@ router.post("/send-email", async (req, res) => {
         "",
         404,
         false,
-        res,
+        res
       );
     }
 
@@ -296,7 +296,7 @@ router.post("/send-email", async (req, res) => {
     const response = await sendMailBack(
       order?.customer?.email, // or order.customer.email if sending to customer
       subject,
-      finalMailBody,
+      finalMailBody
     );
 
     console.log(response);
@@ -306,7 +306,7 @@ router.post("/send-email", async (req, res) => {
         [],
         500,
         false,
-        res,
+        res
       );
     }
 

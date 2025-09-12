@@ -13,6 +13,8 @@ import teamRoutes from "./routes/team.js";
 import orderRoutes from "./routes/order.js";
 import enquiryRoutes from "./routes/enquiry.js";
 import projectRoutes from "./routes/project.js";
+import jobRoutes from "./routes/job.js";
+import applicationRoutes from "./routes/application.js";
 import "dotenv/config";
 import { sendRes } from "./utils/utils.js";
 import { isAdmin, isUser } from "./middleware/adminCheck.js";
@@ -45,6 +47,8 @@ app.use("/api/team", teamRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/enquiry", enquiryRoutes);
 app.use("/api/project", projectRoutes); // Using enquiryRoutes for project as well
+app.use("/api/jobs", jobRoutes); // Using enquiryRoutes for project as well
+app.use("/api/application", applicationRoutes); // Using enquiryRoutes for project as well
 app.post("/api/send-booking-mail", async (req, res) => {
   const data = req.body;
   await sendBookingMailToUserAndAdmin(data, req, res);
