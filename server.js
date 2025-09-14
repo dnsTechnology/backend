@@ -26,7 +26,7 @@ app.use(cookieParser());
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND || "http://localhost:5173",
+    origin: "https://dns-sigma.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
