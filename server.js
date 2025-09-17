@@ -53,6 +53,18 @@ app.post("/api/send-booking-mail", async (req, res) => {
   const data = req.body;
   await sendBookingMailToUserAndAdmin(data, req, res);
 });
+app.get("/api/mydata", isAdmin, (req, res) => {
+  try {
+    const userInfo = req.user;
+    if (!userInfo) {
+      return sendRes("Unauthorized user. login first.", "", 401, false, res);
+    }
+    return sendRes("Successfully got user info.", userInfo, 200, true, res);
+  } catch (error) {
+    console.log(error);
+    return sendRes("Internal server error.", "", 500, false, res);
+  }
+});
 
 // Root route
 app.get("/", (req, res) => {

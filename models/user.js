@@ -30,8 +30,15 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String, // optional profile picture URL
     },
+    forgotpasswordToken: {
+      type: String,
+    },
+    forgotpasswordExpiry: {
+      type: Date,
+      default: Date.now(),
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);

@@ -38,7 +38,7 @@ export const sendBookingMailToUserAndAdmin = async (data) => {
         <h2 style="color: #1a73e8;">Hi ${name},</h2>
         <p>Thank you for booking <strong>${productName}</strong> with <strong>DNS Tech</strong>.</p>
         <p>We've received your booking and our team will contact you soon.</p>
-        <p>If urgent, call us at 
+        <p>If urgent, call us at
           <a href="tel:+9779808271214" style="color: #1a73e8; text-decoration: none;">+977 9808271214</a>
         </p>
 
@@ -156,6 +156,66 @@ export const sendJobApplicationConfirmationEmail = async (email, position) => {
     return {
       success: false,
       message: "Failed to send confirmation email",
+      status: 500,
+      error: error.message,
+    };
+  }
+};
+
+export const sendResetPasswordEmail = async (email, token) => {
+  try {
+    if (!email || !token) {
+      return {
+        message: "Email and token are required. Please try again later.",
+        status: 400,
+        success: false,
+      };
+    }
+
+    // Build reset password link (adjust your frontend URL)
+    const resetUrl = `${process.env.FRONTEND}/reset-password/${token}`;
+
+    // ===== User Email Template =====
+    const userMailHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #2c3e50;">
+        <h2 style="color: #1a73e8;">Hi,</h2>
+        <p>You recently requested to reset your password.</p>
+        <p>Click the link below to reset it:</p>
+        <p>
+          <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px;
+            background-color: #1a73e8; color: #fff; text-decoration: none;
+            font-weight: bold; margin-top: 12px;">
+            Reset Password
+          </a>
+        </p>
+        <p>If the button above doesn’t work, copy and paste this link into your browser:</p>
+        <p style="color:#1a73e8; word-break: break-all;">${resetUrl}</p>
+        <p style="margin-top: 32px;">If you did not request this, you can safely ignore this email.</p>
+        <p style="margin-top: 4px;">— The Support Team</p>
+
+        <hr style="margin-top: 40px;" />
+        <p style="font-size: 12px; color: gray;">This is an automated message. Please do not reply.</p>
+      </div>
+    `;
+
+    // Send mail to User
+    await transporter.sendMail({
+      from: `"Support Team" <${process.env.NODEMAILER_USER}>`,
+      to: email,
+      subject: "Password Reset Request",
+      html: userMailHtml,
+    });
+
+    return {
+      success: true,
+      message: "Reset password email sent successfully",
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Nodemailer Error:", error);
+    return {
+      success: false,
+      message: "Failed to send reset password email",
       status: 500,
       error: error.message,
     };

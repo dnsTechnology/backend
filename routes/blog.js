@@ -6,13 +6,13 @@ import {
   getAllBlogsWithPagination,
   getBlogById,
 } from "../controllers/blog.js";
-import { isUser } from "../middleware/adminCheck.js";
+import { isAdmin } from "../middleware/adminCheck.js";
 
 const router = express.Router();
 
-router.post("/create", isUser, createBlog);
-router.put("/update/:id", isUser, updateBlog);
-router.delete("/delete/:id", isUser, deleteBlog);
+router.post("/create", isAdmin, createBlog);
+router.put("/update/:id", isAdmin, updateBlog);
+router.delete("/delete/:id", isAdmin, deleteBlog);
 router.get("/all", getAllBlogsWithPagination);
 router.get("/:id", getBlogById);
 
