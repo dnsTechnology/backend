@@ -5,9 +5,9 @@ import { sendRes } from "../utils/utils.js";
 
 export const createCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, image, description } = req.body;
 
-    if (!name) {
+    if (!name || !image) {
       return sendRes("All fields are required", "", 400, false, res);
     }
     const user = req?.user;
@@ -19,6 +19,7 @@ export const createCategory = async (req, res) => {
     }
     const category = await ProductCategory.create({
       name,
+      image,
       description,
       author: new mongoose.Types.ObjectId(authorId),
     });
@@ -31,7 +32,7 @@ export const createCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, image } = req.body;
     if (!name) {
       return sendRes("All fields are required", "", 400, false, res);
     }
@@ -44,6 +45,7 @@ export const updateCategory = async (req, res) => {
     const authorId = new mongoose.Types.ObjectId(user._id);
     await ProductCategory.findByIdAndUpdate(req.params.id, {
       name,
+      image,
       description,
       status,
       author: new mongoose.Types.ObjectId(authorId),
@@ -59,7 +61,7 @@ export const deleteCategory = async (req, res) => {
   try {
     const user = req.user;
     if (!user) return sendRes("User not found", "", 404, false, res);
-    const category = await ProductCategory.findByIdAndDelete(req.params.id);
+    const category = await ProductCategory.findByIdAndDelete(req?.params?.id);
     if (!category) return sendRes("Category not found", "", 404, false, res);
     return sendRes("Category deleted successfully", "", 200, true, res);
   } catch (error) {

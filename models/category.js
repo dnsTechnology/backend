@@ -38,6 +38,10 @@ const ProductcategorySchema = new mongoose.Schema(
       trim: true,
       minlength: [2, "Category name must be at least 2 characters"],
     },
+    image: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       default: "",
