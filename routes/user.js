@@ -5,12 +5,20 @@ import {
   logoutUser,
   getMyDetails,
 } from "../controllers/user.js";
-import { isAuthentcated } from "../middleware/adminCheck.js";
+import { isAdmin, isAuthentcated } from "../middleware/adminCheck.js";
 import { sendRes } from "../utils/utils.js";
 import User from "../models/user.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { sendResetPasswordEmail } from "../utils/sendMail.js";
+import Blog from "../models/blog.js";
+import Project from "../models/projects.js";
+import Order from "../models/order.js";
+import Category from "../models/category.js";
+import ProductCategory from "../models/category.js";
+import TeamMember from "../models/teamMember.js";
+import Job from "../models/job.js";
+import Product from "../models/product.js";
 
 const router = express.Router();
 
@@ -18,6 +26,68 @@ router.post("/login", loginUser);
 router.post("/register", registerUser);
 router.post("/logout", isAuthentcated, logoutUser);
 router.get("/me", isAuthentcated, getMyDetails);
+router.get("/dashboard", isAuthentcated, async (req, res) => {
+  try {
+    const totalProducts = await Product.countDocuments();
+    const totalBlogs = await Blog.countDocuments();
+    const totalProjects = await Project.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const totalBlogCategories = await Category.countDocuments();
+    const totalProductCategories = await ProductCategory.countDocuments();
+    const totalTeamMembers = await TeamMember.countDocuments();
+    const totalJobs = await Job.countDocuments();
+    const totalUsers = await User.countDocuments();
+
+    const recentFiveProjects = await Project.find()
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const recentFiveProducts = await Product.find()
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const recentFiveBlogs = await Blog.find().sort({ createdAt: -1 }).limit(5);
+    return sendRes(
+      "Dashboard data fetched successfully",
+      {
+        totalProducts,
+        totalBlogs,
+        totalProjects,
+        totalOrders,
+        totalBlogCategories,
+        totalProductCategories,
+        totalTeamMembers,
+        totalJobs,
+        totalUsers,
+        recentFiveProjects,
+        recentFiveProducts,
+        recentFiveBlogs,
+      },
+      200,
+      true,
+      res
+    );
+  } catch (error) {
+    return sendRes("Internal server error", "", 500, false, res);
+  }
+});
+
+router.get("/allusers", isAdmin, async (req, res) => {
+  try {
+    const userInfo = req.user;
+    if (!userInfo || !userInfo.roles.includes("admin")) {
+      return sendRes("Unauthorized user", "", 401, false, res);
+    }
+
+    const users = await User.find();
+    if (!users) {
+      return sendRes("No users found", "", 404, false, res);
+    }
+    return sendRes("Users fetched successfully", users, 200, true, res);
+  } catch (error) {
+    return sendRes("Internal server error", "", 500, false, res);
+  }
+});
 router.post("/resetpassword", async (req, res) => {
   try {
     const { email } = req.body; // ✅ destructure properly
@@ -28,7 +98,7 @@ router.post("/resetpassword", async (req, res) => {
         "",
         400,
         false,
-        res,
+        res
       );
     }
 
@@ -48,7 +118,7 @@ router.post("/resetpassword", async (req, res) => {
         "",
         401,
         false,
-        res,
+        res
       );
     }
 
@@ -71,7 +141,7 @@ router.post("/resetpassword", async (req, res) => {
         "",
         500,
         false,
-        res,
+        res
       );
     }
 
@@ -80,7 +150,7 @@ router.post("/resetpassword", async (req, res) => {
       "",
       200,
       true,
-      res,
+      res
     );
   } catch (err) {
     console.error(err);
@@ -118,7 +188,7 @@ router.post("/changepass", async (req, res) => {
         "",
         401,
         false,
-        res,
+        res
       );
     }
 
